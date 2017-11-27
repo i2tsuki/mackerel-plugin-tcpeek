@@ -1,0 +1,13 @@
+[Unit]
+Description=tcpeek
+After=local-fs.target network-online.target network.target
+Wants=local-fs.target network-online.target network.target
+
+[Service]
+User=root
+ExecStartPre=/bin/mkdir -p /var/run/tcpeek
+ExecStart=/usr/local/sbin/tcpeek -U /var/run/tcpeek/tcpeek_%I.sock -q -i %I --icmp http-out:TX@%:80 https-out:TX@%:443
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

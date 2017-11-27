@@ -1,0 +1,18 @@
+project_name: mackerel-plugin-tcpeek
+builds:
+  - binary: mackerel-plugin-tcpeek
+    ldflags: -s -w
+    goos:
+      - linux
+      - freebsd
+      - netbsd
+      - openbsd
+    goarch:
+      - arm
+      - 386
+      - amd64
+archive:
+  name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+  format: tar.gz
+  files:
+    - LICENSE
