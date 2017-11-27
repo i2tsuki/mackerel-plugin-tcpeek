@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -ux
+
+cd $(dirname $0)
+if [ "${PWD}" != "${GOPATH}/src/github.com/kizkoh/mackerel_plugin_tcpeek" ] ; then
+   ln -sfn ${PWD} ${GOPATH}/src/github.com/kizkoh/
+fi
+cd ${GOPATH}/src/github.com/kizkoh/mackerel_plugin_tcpeek
+dep ensure
+go build .
