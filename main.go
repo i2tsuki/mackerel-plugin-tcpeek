@@ -1,6 +1,6 @@
 package main
 
-import "github.com/kizkoh/mackerel_plugin_tcpeek/lib"
+import "github.com/kizkoh/mackerel-plugin-tcpeek/lib"
 
 func main() {
 	mptcpeek.Do()
