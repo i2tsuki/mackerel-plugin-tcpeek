@@ -1,1 +1,6 @@
+mackerel-plugin-tcpeek
+
+_vendor*
+
+dist/
 target/
