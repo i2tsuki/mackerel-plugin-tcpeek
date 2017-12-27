@@ -9,7 +9,6 @@ import (
 	"time"
 
 	mp "github.com/mackerelio/go-mackerel-plugin"
-	"github.com/pkg/errors"
 )
 
 var timeout = 3 * time.Second
@@ -56,37 +55,32 @@ func (p TcpeekPlugin) FetchMetrics() (map[string]float64, error) {
 	var status TcpeekStat
 	stat := make(map[string]float64)
 
-	if strings.HasPrefix(p.Socket, "unix://") {
-		conn, err := net.DialTimeout("unix", strings.TrimPrefix(p.Socket, "unix://"), timeout)
-		if err != nil {
-			fmt.Printf("err: %v", err)
-			return stat, nil
-		}
-		defer conn.Close()
+	conn, err := net.DialTimeout("unix", p.Socket, timeout)
+	if err != nil {
+		fmt.Printf("err: %v", err)
+		return stat, nil
+	}
+	defer conn.Close()
 
-		fmt.Fprintf(conn, "REFRESH\r\n")
-		dec := json.NewDecoder(conn)
-		dec.Decode(&status)
+	fmt.Fprintf(conn, "REFRESH\r\n")
+	dec := json.NewDecoder(conn)
+	dec.Decode(&status)
 
-		for _, value := range status {
-			for k, v := range value {
-				if k == "pcap" {
-					continue
-				} else {
-					stat[k+"_success_total"] = float64(v.Success.Total)
-					stat[k+"_success_dupsyn"] = float64(v.Success.DupSyn)
-					stat[k+"_success_dupsynack"] = float64(v.Success.DupSynAck)
+	for _, value := range status {
+		for k, v := range value {
+			if k == "pcap" {
+				continue
+			} else {
+				stat[k+"_success_total"] = float64(v.Success.Total)
+				stat[k+"_success_dupsyn"] = float64(v.Success.DupSyn)
+				stat[k+"_success_dupsynack"] = float64(v.Success.DupSynAck)
 
-					stat[k+"_failure_total"] = float64(v.Failure.Total)
-					stat[k+"_failure_timeout"] = float64(v.Failure.Timeout)
-					stat[k+"_failure_reject"] = float64(v.Failure.Reject)
-					stat[k+"_failure_unreach"] = float64(v.Failure.Unreach)
-				}
+				stat[k+"_failure_total"] = float64(v.Failure.Total)
+				stat[k+"_failure_timeout"] = float64(v.Failure.Timeout)
+				stat[k+"_failure_reject"] = float64(v.Failure.Reject)
+				stat[k+"_failure_unreach"] = float64(v.Failure.Unreach)
 			}
 		}
-	} else {
-		err := errors.New("'--socket' is neither http endpoint nor the unix domain socket, try '--help' for more information")
-		return nil, err
 	}
 
 	return stat, nil
@@ -98,18 +92,16 @@ func (p TcpeekPlugin) GraphDefinition() map[string]mp.Graphs {
 	graphdef := make(map[string]mp.Graphs)
 	var status TcpeekStat
 
-	if strings.HasPrefix(p.Socket, "unix://") {
-		conn, err := net.DialTimeout("unix", strings.TrimPrefix(p.Socket, "unix://"), timeout)
-		if err != nil {
-			fmt.Printf("err: %v", err)
-			return nil
-		}
-		defer conn.Close()
-
-		fmt.Fprintf(conn, "REFRESH\r\n")
-		dec := json.NewDecoder(conn)
-		dec.Decode(&status)
+	conn, err := net.DialTimeout("unix", p.Socket, timeout)
+	if err != nil {
+		fmt.Printf("err: %v", err)
+		return nil
 	}
+	defer conn.Close()
+
+	fmt.Fprintf(conn, "REFRESH\r\n")
+	dec := json.NewDecoder(conn)
+	dec.Decode(&status)
 
 	for _, value := range status {
 		for k, _ := range value {
@@ -151,7 +143,7 @@ func (p TcpeekPlugin) MetricKeyPrefix() string {
 
 // Do the plugin
 func Do() {
-	optSocket := flag.String("socket", "", "Socket (must be with prefix of 'unix://')")
+	optSocket := flag.String("socket", "", "Socket (must be path describe)")
 	optPrefix := flag.String("metric-key-prefix", "", "Prefix")
 	flag.Parse()
 
