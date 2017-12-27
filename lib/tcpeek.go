@@ -14,27 +14,6 @@ import (
 
 var timeout = 3 * time.Second
 
-// // TcpeekPrometheusMetric is metric for tcpeek
-// type TcpeekPrometheusMetric struct {
-// 	Success TcpeekPrometheusSuccess
-// 	Failure TcpeekPrometheusFailure
-// }
-
-// // TcpeekPrometheusSuccess is metric for tcpeek
-// type TcpeekPrometheusSuccess struct {
-// 	Total     prometheus.Gauge
-// 	DupSyn    prometheus.Gauge
-// 	DupSynAck prometheus.Gauge
-// }
-
-// // TcpeekPrometheusFailure is metric for tcpeek
-// type TcpeekPrometheusFailure struct {
-// 	Total   prometheus.Gauge
-// 	Timeout prometheus.Gauge
-// 	Reject  prometheus.Gauge
-// 	Unreach prometheus.Gauge
-// }
-
 // TcpeekPlugin mackerel plugin for tcpeek
 type TcpeekPlugin struct {
 	Socket string
